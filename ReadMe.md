@@ -16,12 +16,18 @@ Eventually this project will get a Swagger UI for REST documentation.
 This service uses MongoDB as a database, so you will have to set up a MongoDB locally, or a remote connection to setup to.  
 To install MongoDB visit: [install MongoDB](https://www.mongodb.com/what-is-mongodb)
 
+It also requires you to get a secret key to encrypt/decrypt the saved passwords.  
+To do this, run the GenerateKey class in the key-generator module, this will generate a key for you to use.
+
 ### Configuration
 I like to run my services locally with the 'dev' profile active, so I can put my development credentials in there.  
 This file (src/main/resources/application-dev.yaml) is in the .gitignore to prevent leaking of credentials.
 For now, the required values to be filled are:
 ```yaml
-jwt.secret: your-jwt-secret
+jwt:
+  secret: your-jwt-secret
+password:
+    key: your-generated-key
 ```
 
 ### Run

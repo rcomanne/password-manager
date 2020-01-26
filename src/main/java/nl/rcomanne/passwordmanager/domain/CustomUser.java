@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
-import java.util.List;
+import java.util.HashMap;
 
 @Data
 @Builder
@@ -17,5 +17,5 @@ public class CustomUser {
     @JsonIgnore
     private String encodedPassword;
     @JsonIgnore
-    private List<Password> passwords;
+    private HashMap<String, Password> passwords;
 }
