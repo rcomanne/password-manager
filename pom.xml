@@ -38,6 +38,13 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <!-- JWT dependency for working with JSON Web Tokens -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+
         <!-- MongoDB as a database -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -56,6 +63,13 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- XML Dependencies since they are no longer included in Java 9+ -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>2.3.2</version>
         </dependency>
 
         <!-- Some extra developer dependencies -->

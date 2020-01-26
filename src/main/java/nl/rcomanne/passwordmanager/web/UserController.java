@@ -2,8 +2,9 @@ package nl.rcomanne.passwordmanager.web;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nl.rcomanne.passwordmanager.domain.User;
+import nl.rcomanne.passwordmanager.domain.CustomUser;
 import nl.rcomanne.passwordmanager.service.UserService;
+import nl.rcomanne.passwordmanager.web.domain.JwtResponse;
 import nl.rcomanne.passwordmanager.web.domain.LoginRequest;
 import nl.rcomanne.passwordmanager.web.domain.RegisterRequest;
 import org.springframework.http.HttpStatus;
@@ -24,17 +25,16 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody @Valid RegisterRequest request) {
+    public ResponseEntity<CustomUser> register(@RequestBody @Valid RegisterRequest request) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(userService.registerUser(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody @Valid LoginRequest request) {
+    public ResponseEntity<JwtResponse> login(@RequestBody @Valid LoginRequest request) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(userService.login(request));
+                .body(new JwtResponse(userService.login(request)));
     }
-
 }

@@ -1,5 +1,1 @@
-spring:
-  security:
-    user:
-      name: test-user
-      password: test-password
+jwt.secret: test-jwt-secret

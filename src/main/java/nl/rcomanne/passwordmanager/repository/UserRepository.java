@@ -1,13 +1,13 @@
 package nl.rcomanne.passwordmanager.repository;
 
-import nl.rcomanne.passwordmanager.domain.User;
+import nl.rcomanne.passwordmanager.domain.CustomUser;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends MongoRepository<User, String> {
+public interface UserRepository extends MongoRepository<CustomUser, String> {
 
-    Optional<User> findByMail(String mail);
+    Optional<CustomUser> findByMail(String mail);
 }

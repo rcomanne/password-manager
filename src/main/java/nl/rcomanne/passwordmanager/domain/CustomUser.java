@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class User {
+public class CustomUser {
     @Id
     private String mail;
     private String username;

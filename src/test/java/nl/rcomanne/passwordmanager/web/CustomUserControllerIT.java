@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @RunWith(SpringRunner.class)
 @WebMvcTest
 @AutoConfigureMockMvc
-class UserControllerIT {
+class CustomUserControllerIT {
 
     @MockBean
     private UserService userService;

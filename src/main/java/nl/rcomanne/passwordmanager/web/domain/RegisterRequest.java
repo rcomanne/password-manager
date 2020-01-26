@@ -3,7 +3,7 @@ package nl.rcomanne.passwordmanager.web.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import nl.rcomanne.passwordmanager.domain.User;
+import nl.rcomanne.passwordmanager.domain.CustomUser;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -33,12 +33,10 @@ public class RegisterRequest {
         return mail.toLowerCase();
     }
 
-    public User toUser() {
-        return User.builder()
+    public CustomUser toUser() {
+        return CustomUser.builder()
                 .mail(mail)
                 .username(username)
-                // TODO: Encrypt password
-                .encodedPassword(password)
                 .build();
     }
 
