@@ -73,7 +73,7 @@ public class UserService {
                 log.error("Exception occured while encrypting passwordToAdd.", ex);
             }
         }
-        // and save the User
+        // add the passwords to and save the User
         user.setPasswords(existingPasswords);
         return repository.save(user);
     }

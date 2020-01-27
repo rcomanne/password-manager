@@ -1,1 +1,3 @@
 jwt.secret: test-jwt-secret
+password:
+  key: test-key
