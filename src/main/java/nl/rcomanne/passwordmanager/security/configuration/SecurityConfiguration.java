@@ -38,7 +38,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 // Ignore auth for these entry points
-                .authorizeRequests().antMatchers("/user/register", "/user/login").permitAll()
+                .authorizeRequests().antMatchers("/user/register", "/user/login", "/pw/test").permitAll()
                 // Ensure every other entry point requires authentication
                 .anyRequest().authenticated()
                 .and()
@@ -48,7 +48,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // Ensure we have a stateless service to prevent credential storage in session
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                // Disable CSRF
+//                 Disable CSRF
                 .csrf().disable();
 
         // Add the filter to validate tokens with every request

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -76,6 +77,23 @@ public class UserService {
         // add the passwords to and save the User
         user.setPasswords(existingPasswords);
         return repository.save(user);
+    }
+
+    public Map<String, Password> getAllPasswords(String mail) {
+        CustomUser user = findUser(mail);
+        HashMap<String, Password> passwords = user.getPasswords();
+
+        if (passwords == null) {
+            return new HashMap<>();
+        }
+
+//        for (Map.Entry<String, Password> entry : passwords.entrySet()) {
+//            Password password = entry.getValue();
+//            password.setPassword("");
+//            passwords.put(entry.getKey(), password);
+//        }
+
+        return passwords;
     }
 
     public Password getPassword(String mail, String passwordName) {

@@ -8,6 +8,7 @@ import nl.rcomanne.passwordmanager.domain.CustomUser;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.HashMap;
 
 @Getter
 @Setter
@@ -17,10 +18,6 @@ public class RegisterRequest {
     @Email(message = "Not a valid email address")
     @NotBlank(message = "Mail is required")
     private String mail;
-
-    @Size(min = 1, max = 256, message = "Username should be between 1 and 256 characters")
-    @NotBlank(message = "Username is required")
-    private String username;
 
     private String name;
 
@@ -35,8 +32,8 @@ public class RegisterRequest {
 
     public CustomUser toUser() {
         return CustomUser.builder()
-                .mail(mail)
-                .username(username)
+                .mail(this.getMail())
+                .passwords(new HashMap<>())
                 .build();
     }
 
