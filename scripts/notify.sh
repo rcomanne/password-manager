@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 echo "sleeping and then trying to send deploy message from the service"
@@ -10,5 +9,5 @@ do
 	sleep 15
 	ret=`curl -s -o /dev/null -w "%{http_code}" -XPOST http://localhost:8101/message/620393195/deployed_new_version_pw_manager`
 	echo "return code: ${ret}"
-	let i=${i}+1
+	i=${i}+1
 done
