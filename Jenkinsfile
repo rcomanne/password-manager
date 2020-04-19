@@ -36,10 +36,9 @@ pipeline {
 				branch 'master'
 			}
 			steps {
-			    echo "No deloyment yet"
-// 				sh "./scripts/cleanup.sh"
-// 				sh "./scripts/copy_and_start.sh"
-// 				sh "./scripts/notify.sh"
+ 				sh "./scripts/cleanup.sh"
+ 				sh "./scripts/copy_and_start.sh"
+ 				sh "./scripts/notify.sh"
 			}
 		}
 	}

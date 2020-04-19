@@ -6,6 +6,7 @@ import nl.rcomanne.passwordmanager.security.jwt.JwtAuthenticationEntryPoint;
 import nl.rcomanne.passwordmanager.security.jwt.JwtRequestFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +17,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Slf4j
 @Configuration
@@ -38,9 +42,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 // Ignore auth for these entry points
-                .authorizeRequests().antMatchers("/user/register", "/user/login", "/pw/test").permitAll()
-                // Ensure every other entry point requires authentication
-                .anyRequest().authenticated()
+                .authorizeRequests()
+                .antMatchers("/user/register", "/user/login", "/pw/test").permitAll()
+                .antMatchers("/pw/*").authenticated()
+                // Ensure every other entry point is allowed
+                .anyRequest().permitAll()
                 .and()
                 // Define the authentication entry point
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
@@ -48,7 +54,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // Ensure we have a stateless service to prevent credential storage in session
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-//                 Disable CSRF
+                // Allow Cors
+                .cors()
+                .and()
+                 // Disable CSRF
                 .csrf().disable();
 
         // Add the filter to validate tokens with every request

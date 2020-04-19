@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin
 @RequestMapping("/pw")
 @RequiredArgsConstructor
 public class PasswordController {
@@ -24,11 +24,11 @@ public class PasswordController {
     private final UserService userService;
 
     @PostMapping("/add")
-    public ResponseEntity<CustomUser> addPassword(@RequestBody AddPasswordRequest request, Principal principal) {
+    public ResponseEntity<Void> addPassword(@RequestBody AddPasswordRequest request, Principal principal) {
         final String mail = principal.getName();
+        log.debug("adding password(s) for user {}", mail);
         CustomUser user = userService.addPasswords(mail, request.getPasswords());
-        return ResponseEntity
-                .ok(user);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/all")
@@ -38,11 +38,11 @@ public class PasswordController {
         return ResponseEntity.ok(userService.getAllPasswords(mail));
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<Password> getPassword(@PathVariable String name, Principal principal) {
+    @GetMapping("/{id}")
+    public ResponseEntity<Password> getPassword(@PathVariable String id, Principal principal) {
         final String mail = principal.getName();
         log.debug("get unencrypted password for user {}", mail);
-        return ResponseEntity.ok(userService.getPassword(mail, name));
+        return ResponseEntity.ok(userService.getPassword(mail, id));
     }
 
     @GetMapping("/test")

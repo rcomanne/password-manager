@@ -13,6 +13,7 @@ import nl.rcomanne.passwordmanager.security.passwords.PasswordEncryption;
 import nl.rcomanne.passwordmanager.web.domain.LoginRequest;
 import nl.rcomanne.passwordmanager.web.domain.PasswordToAdd;
 import nl.rcomanne.passwordmanager.web.domain.RegisterRequest;
+import org.apache.logging.log4j.util.StringMap;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,9 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -64,17 +63,28 @@ public class UserService {
         if (existingPasswords == null) {
             existingPasswords = new HashMap<>();
         }
+        HashMap<String, Password> passwordsToAdd = new HashMap<>();
         // loop over the received list and put the new passwords
         for (PasswordToAdd passwordToAdd : passwords) {
             try {
                 Password password = passwordToAdd.toPassword();
                 password.setPassword(encryptor.encryptPassword(passwordToAdd.getPassword()));
-                existingPasswords.put(passwordToAdd.getName(),password);
+
+                if (existingPasswords.containsValue(password)) {
+                    log.debug("password already exists - skipping");
+                } else {
+                    // check if empty - else assign new id
+                    if (password.getId() == null || password.getId().isEmpty()) {
+                        password.setId(UUID.randomUUID().toString());
+                    }
+                    passwordsToAdd.put(password.getId(), password);
+                }
             } catch (GeneralSecurityException ex) {
                 log.error("Exception occured while encrypting passwordToAdd.", ex);
             }
         }
         // add the passwords to and save the User
+        existingPasswords.putAll(passwordsToAdd);
         user.setPasswords(existingPasswords);
         return repository.save(user);
     }
@@ -96,12 +106,12 @@ public class UserService {
         return passwords;
     }
 
-    public Password getPassword(String mail, String passwordName) {
+    public Password getPassword(String mail, String id) {
         // get the user
         CustomUser user = findUser(mail);
         try {
             // get the specific password object
-            Password password = user.getPasswords().get(passwordName);
+            Password password = user.getPasswords().get(id);
             password.setPassword(encryptor.decryptPassword(password.getPassword()));
             return password;
         } catch (GeneralSecurityException ex) {
