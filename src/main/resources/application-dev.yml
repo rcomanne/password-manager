@@ -3,6 +3,12 @@ jwt:
 password:
   key: 9FF54974E148E8AB10AFB07FD4809B52
 
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+
 #logging:
 #  file:
 #    path: /home/rcomanne/workspace/prive/java/password-manager/logs
