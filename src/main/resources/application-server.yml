@@ -1,12 +1,15 @@
 logging:
   file:
     path: /var/opt/services/logs
-    name: ${logging.file.path}/telegram-bot-klootviool.log
-  config: file:/var/opt/services/telegram-bot-klootviool/logback.xml
+    name: ${logging.file.path}/password-manager.log
+  config: file:/var/opt/services/password-manager/logback.xml
 
 spring:
   devtools:
     add-properties: false
+  data:
+    mongodb:
+      database: pw
 
 server:
   port: 8181

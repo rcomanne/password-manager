@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @RequestMapping("/pw")
 @RequiredArgsConstructor
 public class PasswordController {
