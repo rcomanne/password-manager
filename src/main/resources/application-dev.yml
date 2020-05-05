@@ -1,0 +1,16 @@
+jwt:
+  secret: 4DE1BF3A3275249C20B5966DBFE8F5F2
+password:
+  key: 9FF54974E148E8AB10AFB07FD4809B52
+
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+
+#logging:
+#  file:
+#    path: /home/rcomanne/workspace/prive/java/password-manager/logs
+#    name: ${logging.file.path}/telegram-bot-klootviool.log
+#  config: file:/home/rcomanne/workspace/prive/java/password-manager/src/main/resources/logback-dev.xml

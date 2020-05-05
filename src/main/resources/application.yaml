@@ -2,6 +2,8 @@ server:
   port: 8181
 
 spring:
+  application:
+    name: password-manager-service
   mail:
     host: smtp.gmail.com
     port: 587
