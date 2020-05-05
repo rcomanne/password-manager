@@ -1,11 +1,19 @@
 package nl.rcomanne.passwordmanager.domain;
 
-import lombok.Builder;
-import lombok.Data;
-import org.springframework.data.annotation.Id;
+import lombok.*;
 
-@Data
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity(name = "Password")
+@Table(name = "password")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
 public class Password {
     @Id
     private String id;

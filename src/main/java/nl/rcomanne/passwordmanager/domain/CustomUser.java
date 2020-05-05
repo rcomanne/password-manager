@@ -1,15 +1,19 @@
 package nl.rcomanne.passwordmanager.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Data;
-import org.springframework.data.annotation.Id;
+import lombok.*;
 
-import java.util.HashMap;
-import java.util.List;
+import javax.persistence.*;
+import java.util.Map;
 
-@Data
+@Entity(name = "CustomUser")
+@Table(name = "user")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
 public class CustomUser {
     @Id
     private String mail;
@@ -17,6 +21,11 @@ public class CustomUser {
     private String name;
     @JsonIgnore
     private String encodedPassword;
+
     @JsonIgnore
-    private HashMap<String, Password> passwords;
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Map<String, Password> passwords;
 }
