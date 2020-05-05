@@ -43,11 +43,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 // Ignore auth for these entry points
                 .authorizeRequests()
-                .antMatchers("/user/register", "/user/login", "/pw/test").permitAll()
-                .antMatchers(HttpMethod.OPTIONS, "/*").permitAll()
-                .antMatchers("/pw/").authenticated()
-                // Ensure every other entry point is allowed
-                .anyRequest().permitAll()
+                .antMatchers("/user/register", "/user/login").permitAll()
+                // Ensure every other entry point is authenticated
+                .anyRequest().authenticated()
                 .and()
                 // Define the authentication entry point
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
@@ -55,7 +53,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // Ensure we have a stateless service to prevent credential storage in session
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                // Allow Cors
+                // Allow Cors requests
                 .cors()
                 .and()
                  // Disable CSRF

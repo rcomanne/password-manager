@@ -36,7 +36,7 @@ public class UserService {
 
     private final PasswordEncryption encryptor;
 
-    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public CustomUser findUser(String mail) {
         return repository.findByMail(mail).orElseThrow(() -> new UserNotFoundException(mail));
@@ -97,13 +97,18 @@ public class UserService {
             return new HashMap<>();
         }
 
-//        for (Map.Entry<String, Password> entry : passwords.entrySet()) {
-//            Password password = entry.getValue();
-//            password.setPassword("");
-//            passwords.put(entry.getKey(), password);
-//        }
-
         return passwords;
+    }
+
+    public Map<String, Password> getAllPasswordsCleaned(String mail) {
+        Map<String, Password> passwords = getAllPasswords(mail);
+        Map<String, Password> cleanedPasswords = new HashMap<>();
+        for (Map.Entry<String, Password> entry : passwords.entrySet()) {
+            Password password = entry.getValue();
+            password.setPassword("your_password_is_in_another_castle");
+            cleanedPasswords.put(entry.getKey(), password);
+        }
+        return cleanedPasswords;
     }
 
     public Password getPassword(String mail, String id) {

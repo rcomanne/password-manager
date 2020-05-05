@@ -68,7 +68,7 @@ public class PasswordEncryption {
 
         } catch (GeneralSecurityException ex) {
             log.error("Exception occured while creating cipher", ex);
-            throw new RuntimeException("Error while starting the applicaton.");
+            throw new RuntimeException("Error while starting the application.");
         }
     }
 }
