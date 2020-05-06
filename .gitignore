@@ -140,6 +140,7 @@ fabric.properties
 mvnw
 mvnw.cmd
 
+src/main/resources/application-dev.yml
 src/main/resources/application-dev.yaml
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.

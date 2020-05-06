@@ -25,21 +25,21 @@ public class PasswordController {
 
     @PostMapping("/add")
     public ResponseEntity<Void> addPassword(@RequestBody AddPasswordRequest request, Principal principal) {
-        final String mail = principal.getName();
-        log.debug("adding password(s) for user {}", mail);
-        CustomUser user = userService.addPasswords(mail, request.getPasswords());
+        final String username = principal.getName();
+        log.debug("adding password(s) for user {}", username);
+        CustomUser user = userService.addPasswords(username, request.getPasswords());
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Map<String, Password>> getAllPasswords(Principal principal) {
-        final String mail = principal.getName();
-        log.debug("get all passwords for user {}", mail);
-        return ResponseEntity.ok(userService.getAllPasswordsCleaned(mail));
+    public ResponseEntity<List<Password>> getAllPasswords(Principal principal) {
+        final String username = principal.getName();
+        log.debug("get all passwords for user {}", username);
+        return ResponseEntity.ok(userService.getAllPasswordsCleaned(username));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Password> getPassword(@PathVariable String id, Principal principal) {
+    public ResponseEntity<Password> getPassword(@PathVariable Long id, Principal principal) {
         final String mail = principal.getName();
         log.debug("get unencrypted password for user {}", mail);
         return ResponseEntity.ok(userService.getPassword(mail, id));

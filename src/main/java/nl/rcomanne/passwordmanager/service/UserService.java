@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.rcomanne.passwordmanager.domain.CustomUser;
 import nl.rcomanne.passwordmanager.domain.Password;
+import nl.rcomanne.passwordmanager.exception.PasswordNotFoundException;
 import nl.rcomanne.passwordmanager.exception.UserAlreadyExistsException;
 import nl.rcomanne.passwordmanager.exception.UserNotFoundException;
 import nl.rcomanne.passwordmanager.repository.UserRepository;
@@ -13,7 +14,6 @@ import nl.rcomanne.passwordmanager.security.passwords.PasswordEncryption;
 import nl.rcomanne.passwordmanager.web.domain.LoginRequest;
 import nl.rcomanne.passwordmanager.web.domain.PasswordToAdd;
 import nl.rcomanne.passwordmanager.web.domain.RegisterRequest;
-import org.apache.logging.log4j.util.StringMap;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,7 +21,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.GeneralSecurityException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -42,7 +43,7 @@ public class UserService {
         return repository.findByMail(mail).orElseThrow(() -> new UserNotFoundException(mail));
     }
 
-    public CustomUser registerUser(RegisterRequest registerRequest) {
+    public String registerUser(RegisterRequest registerRequest) {
         // try to find user - if user cannot be found we get an exception and we can continue - else mail is already registered
         try {
             findUser(registerRequest.getMail());
@@ -51,7 +52,10 @@ public class UserService {
             // no user found for mail address - create a new one
             CustomUser user = registerRequest.toUser();
             user.setEncodedPassword(encoder.encode(registerRequest.getPassword()));
-            return repository.save(user);
+            repository.save(user);
+            authenticate(registerRequest.getMail(), registerRequest.getPassword());
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getMail());
+            return jwtTokenUtil.generateToken(userDetails);
         }
     }
 
@@ -59,64 +63,57 @@ public class UserService {
         // get the user
         CustomUser user = findUser(mail);
         // get all passwords and add the new ones
-        HashMap<String, Password> existingPasswords = user.getPasswords();
+        List<Password> existingPasswords = user.getPasswords();
         if (existingPasswords == null) {
-            existingPasswords = new HashMap<>();
+            existingPasswords = new ArrayList<>();
         }
-        HashMap<String, Password> passwordsToAdd = new HashMap<>();
+        List<Password> passwordsToAdd = new ArrayList<>();
         // loop over the received list and put the new passwords
         for (PasswordToAdd passwordToAdd : passwords) {
             try {
                 Password password = passwordToAdd.toPassword();
                 password.setPassword(encryptor.encryptPassword(passwordToAdd.getPassword()));
 
-                if (existingPasswords.containsValue(password)) {
+                if (existingPasswords.contains(password)) {
                     log.debug("password already exists - skipping");
                 } else {
-                    // check if empty - else assign new id
-                    if (password.getId() == null || password.getId().isEmpty()) {
-                        password.setId(UUID.randomUUID().toString());
-                    }
-                    passwordsToAdd.put(password.getId(), password);
+                    passwordsToAdd.add(password);
                 }
             } catch (GeneralSecurityException ex) {
                 log.error("Exception occured while encrypting passwordToAdd.", ex);
             }
         }
         // add the passwords to and save the User
-        existingPasswords.putAll(passwordsToAdd);
+        existingPasswords.addAll(passwordsToAdd);
         user.setPasswords(existingPasswords);
         return repository.save(user);
     }
 
-    public Map<String, Password> getAllPasswords(String mail) {
-        CustomUser user = findUser(mail);
-        HashMap<String, Password> passwords = user.getPasswords();
+    public List<Password> getAllPasswords(String username) {
+        CustomUser user = findUser(username);
+        List<Password> passwords = user.getPasswords();
 
         if (passwords == null) {
-            return new HashMap<>();
+            return new ArrayList<>();
         }
 
         return passwords;
     }
 
-    public Map<String, Password> getAllPasswordsCleaned(String mail) {
-        Map<String, Password> passwords = getAllPasswords(mail);
-        Map<String, Password> cleanedPasswords = new HashMap<>();
-        for (Map.Entry<String, Password> entry : passwords.entrySet()) {
-            Password password = entry.getValue();
-            password.setPassword("your_password_is_in_another_castle");
-            cleanedPasswords.put(entry.getKey(), password);
-        }
-        return cleanedPasswords;
+    public List<Password> getAllPasswordsCleaned(String username) {
+        List<Password> passwords = getAllPasswords(username);
+
+        passwords.forEach(password -> password.setPassword("your_password_is_in_another_castle"));
+
+        return passwords;
     }
 
-    public Password getPassword(String mail, String id) {
+    public Password getPassword(String mail, Long id) {
         // get the user
         CustomUser user = findUser(mail);
         try {
             // get the specific password object
-            Password password = user.getPasswords().get(id);
+            Password password = user.getPasswords().stream().filter(pw -> id.equals(pw.getId())).findFirst().orElseThrow(() -> new PasswordNotFoundException(id, mail));
             password.setPassword(encryptor.decryptPassword(password.getPassword()));
             return password;
         } catch (GeneralSecurityException ex) {

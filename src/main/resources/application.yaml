@@ -4,6 +4,12 @@ server:
 spring:
   application:
     name: password-manager-service
+  datasource:
+    platform: postgres
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
   mail:
     host: smtp.gmail.com
     port: 587

@@ -23,11 +23,11 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<CustomUser> register(@RequestBody @Valid RegisterRequest request) {
+    public ResponseEntity<JwtResponse> register(@RequestBody @Valid RegisterRequest request) {
         log.debug("register request received: {}", request.toString());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(userService.registerUser(request));
+                .body(new JwtResponse(userService.registerUser(request)));
     }
 
     @PostMapping("/login")

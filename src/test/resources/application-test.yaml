@@ -1,3 +1,9 @@
-jwt.secret: test-jwt-secret
+jwt:
+  secret: test-jwt-secret
+
 password:
   key: 112538CFC9978EEE10750F540F4FCFD0
+
+spring:
+  mail:
+    test-connection: false

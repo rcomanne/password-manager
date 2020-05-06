@@ -2,9 +2,8 @@ package nl.rcomanne.passwordmanager.domain;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity(name = "Password")
 @Table(name = "password")
@@ -14,10 +13,17 @@ import javax.persistence.Table;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class Password {
+public class Password implements Serializable {
+
+    @Transient
+    private static final long serialVersionUID = 2402906733003560591L;
+
     @Id
-    private String id;
-    private String name;
-    private String domain;
-    private String password;
+    @GeneratedValue
+    private Long id;
+//    @Id private String id;
+    @Column(name = "name") private String name;
+    @Column(name = "domain") private String domain;
+    @Column(name = "password") private String password;
+
 }
