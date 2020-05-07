@@ -7,6 +7,7 @@ import nl.rcomanne.passwordmanager.domain.Password;
 import nl.rcomanne.passwordmanager.service.PasswordService;
 import nl.rcomanne.passwordmanager.service.UserService;
 import nl.rcomanne.passwordmanager.web.domain.AddPasswordRequest;
+import nl.rcomanne.passwordmanager.web.domain.UpdatePasswordRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,6 +49,14 @@ public class PasswordController {
         final String mail = principal.getName();
         log.debug("adding password(s) for user {}", mail);
         CustomUser user = userService.addPasswords(mail, request.getPasswords());
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<Void> updatePassword(@RequestBody UpdatePasswordRequest request, Principal principal) {
+        final String mail = principal.getName();
+        log.debug("adding password(s) for user {}", mail);
+        userService.updatePassword(mail, request.toPassword());
         return ResponseEntity.ok().build();
     }
 

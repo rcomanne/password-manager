@@ -71,6 +71,24 @@ public class UserService {
         }
     }
 
+    public void updatePassword(String mail, Password newPassword) {
+        // get the user
+        CustomUser user = findUser(mail);
+        // get all passwords and add the new ones
+        List<Password> existingPasswords = user.getPasswords();
+
+        try {
+            newPassword.setPassword(encryptor.encryptPassword(newPassword.getPassword()));
+            existingPasswords.removeIf(existing -> existing.getId().equals(newPassword.getId()));
+            existingPasswords.add(newPassword);
+            user.setPasswords(existingPasswords);
+            repository.save(user);
+        } catch (GeneralSecurityException ex) {
+            log.warn("Exception occurred while encrypting newPassword.", ex);
+            throw new IllegalStateException("Failed to persists new password");
+        }
+    }
+
     public CustomUser addPasswords(String mail, List<PasswordToAdd> passwords) {
         // get the user
         CustomUser user = findUser(mail);
