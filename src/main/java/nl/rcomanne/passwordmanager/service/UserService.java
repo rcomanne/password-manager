@@ -71,10 +71,6 @@ public class UserService {
         }
     }
 
-    public void resetPassword(String mail) {
-
-    }
-
     public CustomUser addPasswords(String mail, List<PasswordToAdd> passwords) {
         // get the user
         CustomUser user = findUser(mail);
@@ -85,20 +81,24 @@ public class UserService {
         }
         List<Password> passwordsToAdd = new ArrayList<>();
         // loop over the received list and put the new passwords
-        for (PasswordToAdd passwordToAdd : passwords) {
-            try {
-                Password password = passwordToAdd.toPassword();
-                password.setPassword(encryptor.encryptPassword(passwordToAdd.getPassword()));
+        for (PasswordToAdd newPassword : passwords) {
+            for (Password existingPassword : existingPasswords) {
+                try {
+                    Password newEncryptedPassword = newPassword.toPassword();
+                    newEncryptedPassword.setPassword(encryptor.encryptPassword(newPassword.getPassword()));
 
-                if (existingPasswords.contains(password)) {
-                    log.debug("password already exists - skipping");
-                } else {
-                    passwordsToAdd.add(password);
+                    // remove the existing password if it's for the same domain and username
+                    if (existingPassword.getName().equals(newPassword.getName()) && existingPassword.getDomain().equals(newPassword.getDomain())) {
+                        existingPasswords.remove(existingPassword);
+                    }
+
+                    passwordsToAdd.add(newEncryptedPassword);
+                } catch (GeneralSecurityException ex) {
+                    log.error("Exception occurred while encrypting newPassword.", ex);
                 }
-            } catch (GeneralSecurityException ex) {
-                log.error("Exception occured while encrypting passwordToAdd.", ex);
             }
         }
+
         // add the passwords to and save the User
         existingPasswords.addAll(passwordsToAdd);
         user.setPasswords(existingPasswords);
