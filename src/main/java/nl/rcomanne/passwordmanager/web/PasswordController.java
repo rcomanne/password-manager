@@ -31,6 +31,7 @@ public class PasswordController {
         switch (type) {
             case "ltrnum": generated = passwordService.generateLettersNumbersPassword(length); break;
             case "ltr": generated = passwordService.generateLettersPassword(length); break;
+            case "special": generated = passwordService.generateLettersSpecialCharactersPassword(length); break;
             default:
             case "all": generated = passwordService.generatePasswordAllCharacters(length); break;
         }

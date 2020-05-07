@@ -5,7 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 @Slf4j
 @Service
@@ -45,6 +48,18 @@ public class PasswordService {
         StringBuilder generated = new StringBuilder();
         for (int i = 0; i < length; i++) {
             generated.append(letters.get(r.nextInt(letters.size())));
+        }
+        return generated.toString();
+    }
+
+    public String generateLettersSpecialCharactersPassword(int length) {
+        StringBuilder generated = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            if (r.nextInt(10) < 8) {
+                generated.append(letters.get(r.nextInt(letters.size())));
+            } else {
+                generated.append(specialCharacters.get(r.nextInt(numbers.size())));
+            }
         }
         return generated.toString();
     }
