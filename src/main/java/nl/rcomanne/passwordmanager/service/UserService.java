@@ -19,10 +19,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -30,6 +32,8 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository repository;
+
+    private final MailService mailService;
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
@@ -39,11 +43,11 @@ public class UserService {
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    public CustomUser findUser(String mail) {
+    private CustomUser findUser(String mail) {
         return repository.findByMail(mail).orElseThrow(() -> new UserNotFoundException(mail));
     }
 
-    public String registerUser(RegisterRequest registerRequest) {
+    public void registerUser(RegisterRequest registerRequest) {
         // try to find user - if user cannot be found we get an exception and we can continue - else mail is already registered
         try {
             findUser(registerRequest.getMail());
@@ -53,10 +57,26 @@ public class UserService {
             CustomUser user = registerRequest.toUser();
             user.setEncodedPassword(encoder.encode(registerRequest.getPassword()));
             repository.save(user);
-            authenticate(registerRequest.getMail(), registerRequest.getPassword());
-            final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getMail());
-            return jwtTokenUtil.generateToken(userDetails);
+
+            mailService.sendActivationMail(user);
         }
+    }
+
+    public boolean activateUser(String activationToken) {
+        Optional<CustomUser> optionalUser = repository.findByActivationToken(activationToken);
+
+        if (optionalUser.isEmpty()) {
+            return false;
+        } else {
+            CustomUser user = optionalUser.get();
+            user.setActivated(true);
+            repository.save(user);
+            return true;
+        }
+    }
+
+    public void resetPassword(String mail) {
+
     }
 
     public CustomUser addPasswords(String mail, List<PasswordToAdd> passwords) {
@@ -124,10 +144,15 @@ public class UserService {
     }
 
     public String login(LoginRequest request) {
-        // authenticate the user with spring security
-        authenticate(request.getMail(), request.getPassword());
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getMail());
-        return jwtTokenUtil.generateToken(userDetails);
+        CustomUser user = findUser(request.getMail());
+        if (user.isActivated()) {
+            // authenticate the user with spring security
+            authenticate(request.getMail(), request.getPassword());
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getMail());
+            return jwtTokenUtil.generateToken(userDetails);
+        } else {
+            throw new IllegalArgumentException("account has not yet been activated");
+        }
     }
 
     private void authenticate(String mail, String password) {

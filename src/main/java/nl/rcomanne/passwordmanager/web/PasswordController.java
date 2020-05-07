@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.rcomanne.passwordmanager.domain.CustomUser;
 import nl.rcomanne.passwordmanager.domain.Password;
+import nl.rcomanne.passwordmanager.service.PasswordService;
 import nl.rcomanne.passwordmanager.service.UserService;
 import nl.rcomanne.passwordmanager.web.domain.AddPasswordRequest;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,26 @@ import java.util.Map;
 public class PasswordController {
 
     private final UserService userService;
+    private final PasswordService passwordService;
+
+    @GetMapping("/generate/{length}/{type}")
+    public ResponseEntity<Map<String, String>> generatePassword(@PathVariable int length, @PathVariable(required = false) String type) {
+        String generated;
+        switch (type) {
+            case "ltrnum": generated = passwordService.generateLettersNumbersPassword(length); break;
+            case "ltr": generated = passwordService.generateLettersPassword(length); break;
+            default:
+            case "all": generated = passwordService.generatePasswordAllCharacters(length); break;
+        }
+        return ResponseEntity
+                .ok(Map.of("generated", generated));
+    }
+
+    @GetMapping("/generate/{length}")
+    public ResponseEntity<Map<String, String>> generatePassword(@PathVariable int length) {
+        return ResponseEntity
+                .ok(Map.of("generated", passwordService.generatePasswordAllCharacters(length)));
+    }
 
     @PostMapping("/add")
     public ResponseEntity<Void> addPassword(@RequestBody AddPasswordRequest request, Principal principal) {

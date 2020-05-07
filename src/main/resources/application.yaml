@@ -7,7 +7,6 @@ spring:
   datasource:
     platform: postgres
   jpa:
-    generate-ddl: true
     hibernate:
       ddl-auto: update
   mail:

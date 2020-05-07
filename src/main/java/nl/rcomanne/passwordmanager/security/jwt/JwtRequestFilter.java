@@ -46,7 +46,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 logger.warn("JWT Token does not begin with Bearer String");
             }
         } else {
-            log.info("No auth header present");
+            log.debug("No auth header present");
         }
 
         // Once we get the token validate it.

@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -23,11 +25,25 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<JwtResponse> register(@RequestBody @Valid RegisterRequest request) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody @Valid RegisterRequest request) {
         log.debug("register request received: {}", request.toString());
+        userService.registerUser(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new JwtResponse(userService.registerUser(request)));
+                .body(Map.of("message", "account has been registered and activation mail has been sent"));
+    }
+
+    @PostMapping("/activate/{token}")
+    public ResponseEntity<Map<String, String>> register(@PathVariable String token) {
+        log.debug("activation request received: {}", token);
+        if (userService.activateUser(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(Map.of("message", "Account has been activated"));
+        } else {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "No account found for token"));
+        }
     }
 
     @PostMapping("/login")

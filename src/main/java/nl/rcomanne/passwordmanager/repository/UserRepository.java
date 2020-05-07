@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface UserRepository extends CrudRepository<CustomUser, Long> {
 
     Optional<CustomUser> findByMail(String mail);
+    Optional<CustomUser> findByActivationToken(String token);
 }
