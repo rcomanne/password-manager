@@ -19,10 +19,11 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleException(Exception ex) {
-        log.error("An exception occured: {}", ex.getMessage(), ex);
+        log.error("An exception occurred: {}", ex.getMessage());
+        log.debug("Exception", ex);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("message", ex.getMessage()));
+                .body(Map.of("message", "an internal error occurred"));
     }
 
     @ExceptionHandler(AlreadyExistsException.class)
