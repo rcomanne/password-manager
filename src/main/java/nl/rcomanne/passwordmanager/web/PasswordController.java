@@ -62,7 +62,7 @@ public class PasswordController {
     @GetMapping("/{id}")
     public ResponseEntity<Password> getPassword(@PathVariable Long id, Principal principal) {
         final String mail = principal.getName();
-        log.debug("get unencrypted password for user {}", mail);
+        log.debug("get unencrypted password {} for user {}", id, mail);
         return ResponseEntity.ok(userService.getPassword(mail, id));
     }
 }

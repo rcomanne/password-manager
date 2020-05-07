@@ -52,7 +52,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(PasswordNotFoundException.class)
     public ResponseEntity<Map<String, String>> handlePasswordNotFoundException(PasswordNotFoundException ex) {
-        log.warn("Password with id {} not found for user", ex.getMessage());
+        log.warn("{}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("message", ex.getMessage()));
