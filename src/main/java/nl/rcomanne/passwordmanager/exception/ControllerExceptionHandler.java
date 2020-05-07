@@ -68,6 +68,7 @@ public class ControllerExceptionHandler {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
+            errors.put("message", errorMessage);
         });
         return errors;
     }
