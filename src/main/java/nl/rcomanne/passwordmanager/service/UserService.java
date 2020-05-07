@@ -19,12 +19,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -62,16 +60,14 @@ public class UserService {
         }
     }
 
-    public boolean activateUser(String activationToken) {
-        Optional<CustomUser> optionalUser = repository.findByActivationToken(activationToken);
-
-        if (optionalUser.isEmpty()) {
-            return false;
+    public String activateUser(String mail, String activationToken) {
+        CustomUser userToActivate = findUser(mail);
+        if (userToActivate.getActivationToken().equals(activationToken)) {
+            userToActivate.setActivated(true);
+            repository.save(userToActivate);
+            return jwtTokenUtil.generateToken(mail);
         } else {
-            CustomUser user = optionalUser.get();
-            user.setActivated(true);
-            repository.save(user);
-            return true;
+            throw new IllegalArgumentException(String.format("Activation tokens for account %s do not match", mail));
         }
     }
 
@@ -138,8 +134,7 @@ public class UserService {
             return password;
         } catch (GeneralSecurityException ex) {
             log.error("Exception occurred while decrypting password", ex);
-            // TODO use better exception than generic runtime
-            throw new RuntimeException("Something went wrong");
+            throw new IllegalStateException("Exception occurred while decrypting password");
         }
     }
 
