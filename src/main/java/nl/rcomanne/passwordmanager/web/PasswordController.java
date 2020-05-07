@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -46,9 +45,17 @@ public class PasswordController {
 
     @PostMapping("/add")
     public ResponseEntity<Void> addPassword(@RequestBody AddPasswordRequest request, Principal principal) {
-        final String username = principal.getName();
-        log.debug("adding password(s) for user {}", username);
-        CustomUser user = userService.addPasswords(username, request.getPasswords());
+        final String mail = principal.getName();
+        log.debug("adding password(s) for user {}", mail);
+        CustomUser user = userService.addPasswords(mail, request.getPasswords());
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePassword(@PathVariable long id, Principal principal) {
+        final String mail = principal.getName();
+        log.debug("deleting password {} for user {}", id, mail);
+        userService.deletePassword(mail, id);
         return ResponseEntity.ok().build();
     }
 

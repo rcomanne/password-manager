@@ -105,6 +105,21 @@ public class UserService {
         return repository.save(user);
     }
 
+    public void deletePassword(String mail, long id) {
+        CustomUser user = findUser(mail);
+        List<Password> passwords = user.getPasswords();
+
+        for (Password password : passwords) {
+            if (password.getId().equals(id)) {
+                passwords.remove(password);
+                repository.save(user);
+                return;
+            }
+        }
+
+        throw new PasswordNotFoundException(id, mail);
+    }
+
     public List<Password> getAllPasswords(String username) {
         CustomUser user = findUser(username);
         List<Password> passwords = user.getPasswords();
