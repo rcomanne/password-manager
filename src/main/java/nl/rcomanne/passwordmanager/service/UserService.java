@@ -14,6 +14,7 @@ import nl.rcomanne.passwordmanager.security.passwords.PasswordEncryption;
 import nl.rcomanne.passwordmanager.web.domain.LoginRequest;
 import nl.rcomanne.passwordmanager.web.domain.PasswordToAdd;
 import nl.rcomanne.passwordmanager.web.domain.RegisterRequest;
+import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -76,37 +77,35 @@ public class UserService {
     }
 
     public void resetPassword(String mail) {
-
+        throw new NotYetImplementedException("Resetting password is not yet implemented");
     }
 
-    public CustomUser addPasswords(String mail, List<PasswordToAdd> passwords) {
+    @Transactional
+    public void addPasswords(String mail, List<PasswordToAdd> newPasswords) {
         // get the user
         CustomUser user = findUser(mail);
         // get all passwords and add the new ones
-        List<Password> existingPasswords = user.getPasswords();
-        if (existingPasswords == null) {
-            existingPasswords = new ArrayList<>();
+        List<Password> passwords = user.getPasswords();
+        if (passwords == null) {
+            passwords = new ArrayList<>();
         }
-        List<Password> passwordsToAdd = new ArrayList<>();
+
         // loop over the received list and put the new passwords
-        for (PasswordToAdd passwordToAdd : passwords) {
+        for (PasswordToAdd passwordToAdd : newPasswords) {
             try {
+                // convert the object to a Password object and encrypt the password itself
                 Password password = passwordToAdd.toPassword();
                 password.setPassword(encryptor.encryptPassword(passwordToAdd.getPassword()));
 
-                if (existingPasswords.contains(password)) {
-                    log.debug("password already exists - skipping");
-                } else {
-                    passwordsToAdd.add(password);
-                }
+                // remove existing password if it is for the same domain and username
+                passwords.removeIf(currentPassword -> currentPassword.getDomain().equals(password.getDomain()) && currentPassword.getName().equals(password.getName()));
+
+                // add the password to the list
+                passwords.add(password);
             } catch (GeneralSecurityException ex) {
                 log.error("Exception occured while encrypting passwordToAdd.", ex);
             }
         }
-        // add the passwords to and save the User
-        existingPasswords.addAll(passwordsToAdd);
-        user.setPasswords(existingPasswords);
-        return repository.save(user);
     }
 
     public List<Password> getAllPasswords(String username) {
@@ -138,8 +137,7 @@ public class UserService {
             return password;
         } catch (GeneralSecurityException ex) {
             log.error("Exception occurred while decrypting password", ex);
-            // TODO use better exception than generic runtime
-            throw new RuntimeException("Something went wrong");
+            throw new IllegalStateException("Something went wrong");
         }
     }
 

@@ -2,7 +2,6 @@ package nl.rcomanne.passwordmanager.web;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nl.rcomanne.passwordmanager.domain.CustomUser;
 import nl.rcomanne.passwordmanager.domain.Password;
 import nl.rcomanne.passwordmanager.service.PasswordService;
 import nl.rcomanne.passwordmanager.service.UserService;
@@ -11,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +46,7 @@ public class PasswordController {
     public ResponseEntity<Void> addPassword(@RequestBody AddPasswordRequest request, Principal principal) {
         final String username = principal.getName();
         log.debug("adding password(s) for user {}", username);
-        CustomUser user = userService.addPasswords(username, request.getPasswords());
+        userService.addPasswords(username, request.getPasswords());
         return ResponseEntity.ok().build();
     }
 
