@@ -92,7 +92,7 @@ public class UserService {
             try {
                 // convert the object to a Password object and encrypt the password itself
                 Password password = passwordToAdd.toPassword();
-                password.setEncodedPassword(encryptor.encryptPassword(passwordToAdd.getPassword()));
+                password.setPassword(encryptor.encryptPassword(passwordToAdd.getPassword()));
 
                 // remove existing password if it is for the same domain and username
                 passwords.removeIf(currentPassword -> currentPassword.getDomain().equals(password.getDomain()) && currentPassword.getName().equals(password.getName()));
@@ -133,7 +133,7 @@ public class UserService {
     public List<Password> getAllPasswordsCleaned(String username) {
         List<Password> passwords = getAllPasswords(username);
 
-        passwords.forEach(password -> password.setEncodedPassword("your_password_is_in_another_castle"));
+        passwords.forEach(password -> password.setPassword("your_password_is_in_another_castle"));
 
         return passwords;
     }
@@ -144,7 +144,7 @@ public class UserService {
         try {
             // get the specific password object
             Password password = user.getPasswords().stream().filter(pw -> id.equals(pw.getId())).findFirst().orElseThrow(() -> new PasswordNotFoundException(id, mail));
-            password.setEncodedPassword(encryptor.decryptPassword(password.getEncodedPassword()));
+            password.setPassword(encryptor.decryptPassword(password.getPassword()));
             return password;
         } catch (GeneralSecurityException ex) {
             log.error("Exception occurred while decrypting password", ex);

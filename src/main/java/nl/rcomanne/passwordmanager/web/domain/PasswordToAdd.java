@@ -25,7 +25,7 @@ public class PasswordToAdd {
         return Password.builder()
                 .name(this.name)
                 .domain(this.domain)
-                .encodedPassword(this.password)
+                .password(this.password)
                 .build();
     }
 }
