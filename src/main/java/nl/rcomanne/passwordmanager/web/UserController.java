@@ -3,6 +3,7 @@ package nl.rcomanne.passwordmanager.web;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.rcomanne.passwordmanager.service.UserService;
+import nl.rcomanne.passwordmanager.web.domain.ActivationRequest;
 import nl.rcomanne.passwordmanager.web.domain.JwtResponse;
 import nl.rcomanne.passwordmanager.web.domain.LoginRequest;
 import nl.rcomanne.passwordmanager.web.domain.RegisterRequest;
@@ -32,17 +33,12 @@ public class UserController {
                 .body(Map.of(MESSAGE, "Account has been registered and activation mail has been sent"));
     }
 
-    @PostMapping("/activate/{token}")
-    public ResponseEntity<Map<String, String>> register(@PathVariable String token) {
-        log.debug("activation request received: {}", token);
-        if (userService.activateUser(token)) {
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(Map.of(MESSAGE, "Account has been activated"));
-        } else {
-            return ResponseEntity.badRequest()
-                    .body(Map.of(MESSAGE, "No account found for token"));
-        }
+    @PostMapping("/activate")
+    public ResponseEntity<JwtResponse> activate(@RequestBody @Valid ActivationRequest request) {
+        log.debug("activation request received: {}", request.getActivationToken());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new JwtResponse("Account has been activated", userService.activateUser(request.getMail(), request.getActivationToken())));
     }
 
     @PostMapping("/login")
@@ -50,6 +46,6 @@ public class UserController {
         log.debug("login request received: {}", request.toString());
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new JwtResponse(userService.login(request)));
+                .body(new JwtResponse("User has been logged in", userService.login(request)));
     }
 }

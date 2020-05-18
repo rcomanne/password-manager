@@ -19,7 +19,7 @@ public class JwtTokenUtil implements Serializable {
     private static final long serialVersionUID = 3178569783957161531L;
 
     // minutes * seconds * ms
-    private static final long JWT_TOKEN_VALIDITY = 300 * 60 * 1000;
+    private static final long JWT_TOKEN_VALIDITY = 300L * 60L * 1000L;
 
     // Secret used to hash the token
     @Value("${jwt.secret}")
@@ -50,6 +50,11 @@ public class JwtTokenUtil implements Serializable {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return doGenerateToken(claims, userDetails.getUsername());
+    }
+
+    public String generateToken(String mail) {
+        Map<String, Object> claims = new HashMap<>();
+        return doGenerateToken(claims, mail);
     }
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {

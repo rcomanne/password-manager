@@ -57,6 +57,14 @@ public class PasswordController {
         return ResponseEntity.ok(userService.getAllPasswordsCleaned(username));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePassword(@PathVariable long id, Principal principal) {
+        final String mail = principal.getName();
+        log.debug("deleting password {} for user {}", id, mail);
+        userService.deletePassword(mail, id);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Password> getPassword(@PathVariable Long id, Principal principal) {
         final String mail = principal.getName();

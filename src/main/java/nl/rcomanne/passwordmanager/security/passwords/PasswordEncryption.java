@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.crypto.Cipher;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.GeneralSecurityException;
 
@@ -14,6 +15,7 @@ import java.security.GeneralSecurityException;
 public class PasswordEncryption {
 
     public static final String AES = "AES";
+    public static final String AES_GCM_NO_PADDING = "AES/GCM/NoPadding";
 
     @Value("${password.key}")
     private String key;
@@ -54,6 +56,7 @@ public class PasswordEncryption {
     @PostConstruct
     private void initializeCipher() {
         try {
+            // TODO: Change cipher initialization, try using AES/GCM?
             // initialize the encryptor
             byte[] bytekey = hexStringToByteArray(key);
             SecretKeySpec sks = new SecretKeySpec(bytekey, AES);
@@ -63,12 +66,14 @@ public class PasswordEncryption {
 
             // initialize the decryptor
             Cipher decryptCipher = Cipher.getInstance(AES);
+//            GCMParameterSpec parameterSpec = new GCMParameterSpec(128, bytekey);
+//            decryptCipher.init(Cipher.DECRYPT_MODE, sks, parameterSpec);
             decryptCipher.init(Cipher.DECRYPT_MODE, sks);
             this.decryptor = decryptCipher;
 
         } catch (GeneralSecurityException ex) {
             log.error("Exception occured while creating cipher", ex);
-            throw new RuntimeException("Error while starting the application.");
+            throw new IllegalStateException("Error while starting the application.");
         }
     }
 }

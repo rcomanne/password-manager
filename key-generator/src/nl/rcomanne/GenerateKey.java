@@ -3,6 +3,7 @@ package nl.rcomanne;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.stream.IntStream;
 
 public class GenerateKey {
@@ -19,8 +20,9 @@ public class GenerateKey {
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
+        final SecureRandom secureRandom = SecureRandom.getInstanceStrong();
         KeyGenerator keyGen = KeyGenerator.getInstance(GenerateKey.AES);
-        keyGen.init(128);
+        keyGen.init(128, secureRandom);
         SecretKey sk = keyGen.generateKey();
         String key = byteArrayToHexString(sk.getEncoded());
         System.out.println("key:" + key);

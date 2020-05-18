@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -63,16 +62,14 @@ public class UserService {
         }
     }
 
-    public boolean activateUser(String activationToken) {
-        Optional<CustomUser> optionalUser = repository.findByActivationToken(activationToken);
-
-        if (optionalUser.isEmpty()) {
-            return false;
+    public String activateUser(String mail, String activationToken) {
+        CustomUser userToActivate = findUser(mail);
+        if (userToActivate.getActivationToken().equals(activationToken)) {
+            userToActivate.setActivated(true);
+            repository.save(userToActivate);
+            return jwtTokenUtil.generateToken(mail);
         } else {
-            CustomUser user = optionalUser.get();
-            user.setActivated(true);
-            repository.save(user);
-            return true;
+            throw new IllegalArgumentException(String.format("Activation tokens for account %s do not match", mail));
         }
     }
 
@@ -95,7 +92,7 @@ public class UserService {
             try {
                 // convert the object to a Password object and encrypt the password itself
                 Password password = passwordToAdd.toPassword();
-                password.setPassword(encryptor.encryptPassword(passwordToAdd.getPassword()));
+                password.setEncodedPassword(encryptor.encryptPassword(passwordToAdd.getPassword()));
 
                 // remove existing password if it is for the same domain and username
                 passwords.removeIf(currentPassword -> currentPassword.getDomain().equals(password.getDomain()) && currentPassword.getName().equals(password.getName()));
@@ -106,6 +103,20 @@ public class UserService {
                 log.error("Exception occured while encrypting passwordToAdd.", ex);
             }
         }
+    }
+
+    @Transactional
+    public void deletePassword(String mail, long id) {
+        CustomUser user = findUser(mail);
+        List<Password> passwords = user.getPasswords();
+
+        for (Password password : passwords) {
+            if (password.getId().equals(id)) {
+                passwords.remove(password);
+                return;
+            }
+        }
+        throw new PasswordNotFoundException(id, mail);
     }
 
     public List<Password> getAllPasswords(String username) {
@@ -122,7 +133,7 @@ public class UserService {
     public List<Password> getAllPasswordsCleaned(String username) {
         List<Password> passwords = getAllPasswords(username);
 
-        passwords.forEach(password -> password.setPassword("your_password_is_in_another_castle"));
+        passwords.forEach(password -> password.setEncodedPassword("your_password_is_in_another_castle"));
 
         return passwords;
     }
@@ -133,7 +144,7 @@ public class UserService {
         try {
             // get the specific password object
             Password password = user.getPasswords().stream().filter(pw -> id.equals(pw.getId())).findFirst().orElseThrow(() -> new PasswordNotFoundException(id, mail));
-            password.setPassword(encryptor.decryptPassword(password.getPassword()));
+            password.setEncodedPassword(encryptor.decryptPassword(password.getEncodedPassword()));
             return password;
         } catch (GeneralSecurityException ex) {
             log.error("Exception occurred while decrypting password", ex);

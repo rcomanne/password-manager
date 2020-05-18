@@ -22,7 +22,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     private final UserRepository repository;
 
     @Override
-    public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String mail) {
         CustomUser user = findUser(mail);
         if (user != null) {
             return new User(user.getMail(), user.getEncodedPassword(), Collections.singletonList(new SimpleGrantedAuthority("USER")));

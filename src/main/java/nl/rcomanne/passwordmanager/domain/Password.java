@@ -21,9 +21,8 @@ public class Password implements Serializable {
     @Id
     @GeneratedValue
     private Long id;
-//    @Id private String id;
     @Column(name = "name") private String name;
     @Column(name = "domain") private String domain;
-    @Column(name = "password") private String password;
+    @Column(name = "encodedPassword") private String encodedPassword;
 
 }

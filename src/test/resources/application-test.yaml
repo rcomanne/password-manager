@@ -2,7 +2,7 @@ jwt:
   secret: test-jwt-secret
 
 password:
-  key: 112538CFC9978EEE10750F540F4FCFD0
+  key: 'A959E6423D0E92FB85CD034DBEA5F210'
 
 spring:
   mail:
