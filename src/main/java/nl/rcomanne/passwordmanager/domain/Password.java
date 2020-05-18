@@ -23,6 +23,6 @@ public class Password implements Serializable {
     private Long id;
     @Column(name = "name") private String name;
     @Column(name = "domain") private String domain;
-    @Column(name = "encodedPassword") private String encodedPassword;
+    @Column(name = "password") private String password;
 
 }
