@@ -39,7 +39,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 // Ignore auth for these entry points
                 .authorizeRequests()
-                .antMatchers("/user/register", "/user/login", "/user/activate/*").permitAll()
+                .antMatchers("/user/register", "/user/login", "/user/activate").permitAll()
                 .antMatchers("/pw/generate/**").permitAll()
                 // Ensure every other entry point is authenticated
                 .anyRequest().authenticated()

@@ -11,14 +11,14 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MailService {
-    private static final String appName = "PasswordManager";
-    private static final String apiHost = "https://api.rcomanne.nl";
+    private static final String APP_NAME = "PasswordManager";
+    private static final String SITE_HOST = "https://pw.rcomanne.nl";
 
     private final JavaMailSender mailSender;
 
     public void sendActivationMail(CustomUser user) {
-        final String subject = String.format("Activate your account for %s", appName);
-        final String message = String.format("To activate your account, please go to %s/user/activate/%s", apiHost, user.getActivationToken());
+        final String subject = String.format("Activate your account for %s", APP_NAME);
+        final String message = String.format("To activate your account, please go to %s/user/activate\n and use %s to activate your account", SITE_HOST, user.getActivationToken());
         sendMail(user.getMail(), "Activate your account for " + subject, message);
     }
 
